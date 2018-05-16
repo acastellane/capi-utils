@@ -233,12 +233,14 @@ if (($force != 1)); then
         [Nn]* ) exit;;
       esac
     done
-    # Use flash address 0x0 by default
-    # TODO: add factory flash address to psl-devices
-    flash_address=0x0
   fi
 else
   printf "Continue to flash ${bold}$1${normal} to ${bold}card$c${normal}\n"
+fi
+# Use flash address 0x0 by default
+# TODO: add factory flash address to psl-devices
+if (($flash_factory == 1)); then
+  flash_address=0x0
 fi
 
 printf "\n"
