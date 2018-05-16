@@ -180,7 +180,7 @@ int main (int argc, char *argv[])
   num_blocks = fsize / flash_block_size;
   // Size of flash block in words. Flash word = 4B
   flash_block_size_words = flash_block_size / 4;
-  printf("Programming User Partition (0x%08X) with %s\n", address, fpga_file);
+  printf("Programming Flash Partition (0x%08X) with %s\n", address, fpga_file);
   printf("  Program ->  for Size: %d in blocks (%dK Words or %dK Bytes)\n\n",num_blocks, 
       (flash_block_size / (4 * 1024)), flash_block_size / 1024);
   set = time(NULL);  

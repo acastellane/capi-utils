@@ -29,7 +29,7 @@ flash_address=""
 flash_block_size=""
 
 reset_factory=0
-
+flash_factory=0
 
 # Print usage message helper function
 function usage() {
@@ -38,6 +38,7 @@ function usage() {
   echo "    [-f] force execution without asking."
   echo "         warning: use with care e.g. for automation."
   echo "    [-r] Reset adapter to factory before writing to flash."
+  echo "    [-x] flash factory partition."
   echo "    [-V] Print program version (${version})"
   echo "    [-h] Print this help message."
   echo "    <path-to-bit-file>"
@@ -51,7 +52,7 @@ function usage() {
 }
 
 # Parse any options given on the command line
-while getopts ":C:fVhr" opt; do
+while getopts ":C:fVhrx" opt; do
   case ${opt} in
       C)
       card=$OPTARG
@@ -61,6 +62,9 @@ while getopts ":C:fVhr" opt; do
       ;;
       r)
       reset_factory=1
+      ;;
+      x)
+      flash_factory=1
       ;;
       V)
       echo "${version}" >&2
@@ -221,6 +225,18 @@ if (($force != 1)); then
       * ) printf "${bold}ERROR:${normal} Please answer with y or n\n";;
     esac
   done
+  if (($flash_factory == 1)); then
+    while true; do
+      read -p "Do you want to flash the factory partition? [y/n] " yn
+      case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exit;;
+      esac
+    done
+    # Use flash address 0x0 by default
+    # TODO: add factory flash address to psl-devices
+    flash_address=0x0
+  fi
 else
   printf "Continue to flash ${bold}$1${normal} to ${bold}card$c${normal}\n"
 fi
@@ -250,8 +266,11 @@ trap - TERM INT
 wait $PID
 
 # reset card
-reset_card $c user
-
+if (($flash_factory == 1)); then
+  reset_card $c factory
+else
+  reset_card $c user
+fi
 # remind afu to use in host application
 # Y.Lu: This is not needed for SNAP. The DEVICE may not be in dedicated mode. Comment off.
 
